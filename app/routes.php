@@ -432,5 +432,33 @@ return function (App $app) {
         }
     });
 
+    $app->delete('/detailpemesanandelete', function($request, $response, $args) {
+        $parsedBody = $request->getParsedBody();
+    
+        $IdDetailPemesanan = $parsedBody['d_Id_Detail_Pemesanan'];
+        $IdCustomer = $parsedBody['d_Id_Customer'];
+        $Stokbeli = $parsedBody['d_StokBeli'];
+        $IdProduk = $parsedBody['d_Id_Produk'];
+        $Statement = $parsedBody['Statement'];
+    
+        $db = $this->get(PDO::class);
+        
+        try {
+            $query = $db->prepare('CALL UpdateDeleteDetailPemesanan(?, ?, ?, ? ,?)');
+            $query->execute([$IdDetailPemesanan, $IdCustomer, $Stokbeli, $IdProduk, $Statement]);
+    
+            $response->getBody()->write(json_encode([
+                'message' => 'Detail Pemesanan Berhasil Dihapus Pada Id ' . $IdDetailPemesanan
+            ]));
+    
+            return $response->withHeader('Content-Type', 'application/json');
+        } catch (PDOException $e) {
+            $response->getBody()->write(json_encode([
+                'error' => 'Terjadi kesalahan dalam menghapus Detail Pemesanan: ' 
+            ]));
+            return $response->withStatus(500)->withHeader('Content-Type', 'application/json');
+        }
+    });
+
 };
 
